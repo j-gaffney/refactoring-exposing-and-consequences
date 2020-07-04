@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Method;
 use ReflectionClass;
 
 class AnnotationReader
@@ -15,19 +16,26 @@ class AnnotationReader
 
     public function having($annotation)
     {
-        $reflector = new \ReflectionClass($this->reference);
-        $methods = $reflector->getMethods();
-        $results = [];
 
-        foreach ($methods as $method) {
-            $docBlock = $method->getDocComment();
+         $methods = [];
 
-            if(stristr($docBlock, "@{$annotation}") !== false){
-                $results[] = $method->getName();
+        /** @var Method $method */
+        foreach ($this->reflectInto() as $method) {
+            if ($method->hasAnnotation($annotation)) {
+                $methods[] = $method->name();
             }
         }
 
-        return $results;
+        return $methods;
     }
 
+    public function reflectInto()
+    {
+        $methods = (new ReflectionClass($this->reference))->getMethods();
+
+        return array_map(function ($method){
+            return new Method($method);
+
+        }, $methods);
+    }
 }

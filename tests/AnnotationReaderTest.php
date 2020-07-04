@@ -1,29 +1,26 @@
 <?php
-namespace tests\App;
-
-use PHPUnit\Framework\TestCase;
+namespace Tests\App;
 
 use App\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 
 class AnnotationReaderTest extends TestCase
 {
     protected static $annotationReader;
+    protected static $method;
 
     public static function setUpBeforeClass(): void
     {
         self::$annotationReader = new AnnotationReader(Stub::class);
-    }
 
-    public function testAssertTrue(): void
-    {
-        $this->assertTrue(true);
+        self::$method = (new \ReflectionClass(Stub::class))->getMethods()[0];
     }
 
     public function testFindsMethodNamesWithGivenAnnotation(): void
     {
-        $method = self::$annotationReader->having('setUp');
+        $methods = self::$annotationReader->having('setUp');
 
-        $this->assertEquals(['method1'], $method);
+        $this->assertEquals(['method1'], $methods);
     }
 }
 
